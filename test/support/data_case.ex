@@ -18,7 +18,6 @@ defmodule PipelineCi.DataCase do
 
   using do
     quote do
-      alias Ecto.Adapters.SQL.Sandbox
       alias PipelineCi.Repo
 
       import Ecto
@@ -37,10 +36,11 @@ defmodule PipelineCi.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
-    pid = Sandbox.start_owner!(PipelineCi.Repo, shared: not tags[:async])
-    on_exit(fn -> Sandbox.stop_owner(pid) end)
+    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(PipelineCi.Repo, shared: not tags[:async])
+    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
   end
 
+  @spec errors_on(Ecto.Changeset.t()) :: %{optional(atom) => list}
   @doc """
   A helper that transforms changeset errors into a map of messages.
 
